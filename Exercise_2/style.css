@@ -34,6 +34,7 @@ p{
 }
 
 /*------------styling for axes-----------*/
+/*
 .axis .domain{
     fill:none
 }
@@ -44,4 +45,14 @@ p{
 .axis .tick text{
     font-size:10px;
     fill:rgb(180,180,180);
+}
+*/
+.domain
+{
+	fill: none;
+}
+.axis .tick line
+{
+	stroke: black;
+	stroke-width: 1px;
 }

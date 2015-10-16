@@ -12,6 +12,15 @@ var plot = d3.select('#plot')
     .append('g')
     .attr('class','plot-area')
     .attr('transform','translate('+margin.l+','+margin.t+')');
+//
+var axisX = d3.svg.axis()
+    .orient('bottom')
+        .tickValues([1000,5000,10000,50000])
+    .tickSize(-height),
+    axisY = d3.svg.axis()
+    .orient('left')
+        .tickSize(-width);
+    //what are scales with which we draw these axis
 
 //Start importing data
 d3.csv('../data/world_bank_2012.csv', parse, dataLoaded);
@@ -38,8 +47,19 @@ function dataLoaded(error, rows){
         gdpPerCapMax = d3.max(rows, function(d){return d.gdpPerCap});
 
     //with mined information, we can now set up the scales
-    var scaleX = d3.scale.linear().domain([0,50000]).range([0,width]),
+    var scaleX = d3.scale.log().domain([1000,50000]).range([0,width]),
         scaleY = d3.scale.linear().domain([0,100]).range([height,0]);
+
+    //define the scales to draw the axis by
+    axisX.scale(scaleX);
+    axisY.scale(scaleY);
+
+    plot
+        .append('g')
+        .attr('class','axis axis-x')
+        .attr('transform','translate(0,'+height+')')
+        .call(axisX);
+    plot.append('g').attr('class','axis axis-y').call(axisY);
 
     //draw
     rows.forEach(function(row){

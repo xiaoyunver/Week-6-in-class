@@ -26,11 +26,53 @@ d3.csv('../data/world_bank_2012.csv', parse, dataLoaded);
 
 function parse(d){
     //For now, return the old row verbatim as the new row
-    return d;
+
+
+    return {
+        gdpPerCap: (d['GDP per capita, PPP (constant 2011 international $)'] == "..")?undefined:+d['GDP per capita, PPP (constant 2011 international $)'],
+        cCode: d['Country Code'],
+        cName: d['Country Name'],
+        primaryCompletion: (d['Primary completion rate, total (% of relevant age group)'] == "..")?undefined:+d['Primary completion rate, total (% of relevant age group)'],
+        Urbanpop: (d['Urban population (% of total)'] == "..")?undefined:+d['Urban population (% of total)']
+    };
 
     //What are some issues we might encounter as we parse this?
 }
 
 function dataLoaded(error, rows){
-    console.log(rows);
+    var minGdpPerCap = d3.min(rows,function(d){return d.gdpPerCap}),
+        maxGdpPerCap = d3.max(rows,function(d){return d.gdpPerCap});
+
+    var minPrimComp = d3.min(rows,function(d){return d.primaryCompletion}),
+        maxPrimComp = d3.max(rows,function(d){return d.primaryCompletion});
+
+    var ScaleX = d3.scale.linear()
+        .domain([minGdpPerCap *.9,maxGdpPerCap*1.1])
+        .range([0,width]);
+
+    var ScaleY = d3.scale.linear()
+        .domain([0,150])
+        .range([height,0]);
+
+    rows.forEach(function(element)
+    {
+        if (element.gdpPerCap == undefined || element.primaryCompletion == undefined)
+        {
+            return;
+        }
+        var countries = plot.append('g')
+            .attr('class','country')
+            .attr('transform','translate('+ ScaleX(element.gdpPerCap) + ',' + ScaleY(element.primaryCompletion) +')');
+
+        countries.append('circle')
+            .attr('r',5)
+            .style('stroke','black')
+            .style('stroke-width','1px')
+            .style('fill','rgba(100,100,100,.5)');
+
+        countries.append('text')
+            .text(element.cName);
+
+    })
+
 }
